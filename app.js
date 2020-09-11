@@ -1,43 +1,51 @@
 function dataset(data) {
-    d3.json(`/metadata/${sample}`).then(function(sampleData){
+    d3.json("samples.json").then(function(sampleData){
         console.log(sampleData);
-
+        var metadata = sampleData.metadata;
+        var resultArray = metadata.filter(sampleObj => sampleObj.id ==data);
+        var result = resultArray[0];
         var panel = d3.select("#sample-metadata");
 
         panel.html("");
 
-        Object.entries(sampleData).forEach(([key, value]) => {
-            panel.append("h4").text('${key}, ${value}');
-        })
+        Object.entries(result).forEach(([key, value]) => {
+            panel.append("h4").text(`${key.toUpperCase()}: ${value}`);
+        });
     })
 }
 
 function buildCharts(data) {
-    d3.json(`/samples/${sample}`).then(function(sampleData) {
+    d3.json("samples.json").then((sampleData) =>{
         console.log(sampleData);
 
-        const otu_ids = sampleData.otu_ids;
-        const out_labels = sampleData.out_labels;
-        const sample_values = sampleData.sample_values;
+        var samples = sampleData.samples;
+        var resultArray = samples.filter(sampleObj => sampleObj.id ==data);
+        var result = resultArray[0];
+
+        var otu_ids = result.otu_ids;
+        var otu_labels = result.otu_labels;
+        var sample_values = result.sample_values;
 
         var barData = [{
-            x: sample_values,
-            y: otu_ids,
+            y: otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse(),
+            x: sample_values.slice(0,10).reverse(),
             type: 'bar',
-            text: otu_labels,
+            text: otu_labels.slice(0,10).reverse(),
+            orientation: "h",
             marker: {
                 color: 'rgb(142, 124, 195)'
             }
+            
         }];
 
         var barLayout = {
             hovermode: 'closest',
-            yaxis: {title: 'OTU ID', tickangle: -180},
+            yaxis: {title: 'OTU ID'},
             xaxis: {title: 'Sample Values'},
             bargap: 0.05
         };
 
-        Plotly.newplot('myDiv', barData, barLayout);
+        Plotly.newPlot('bar', barData, barLayout);
 
         var bubbleData = [{
             x: otu_ids,
@@ -65,7 +73,8 @@ function buildCharts(data) {
 function init() {
     var selector = d3.select("#selDataset");
 
-    d3.json("/samples/${names}").then((sampleNames) => {
+    d3.json("samples.json").then((sampleNames) => {
+        var sampleNames = sampleNames.names;
         sampleNames.forEach((sample) => {
             selector.append("option")
                 .text(sample)
