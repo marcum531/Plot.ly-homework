@@ -5,7 +5,7 @@ function dataset(data) {
         var resultArray = metadata.filter(sampleObj => sampleObj.id == data);
         var result = resultArray[0];
         var panel = d3.select("#sample-metadata");
-        console.log(sampleData);
+        //console.log(sampleData);
         panel.html("");
         
         Object.entries(result).forEach(([key, value]) => {
@@ -16,16 +16,17 @@ function dataset(data) {
 
 function buildCharts(data) {
     d3.json("samples.json").then((sampleData) =>{
-        console.log(sampleData);
+        //console.log(sampleData);
 
         var samples = sampleData.samples;
         var resultArray = samples.filter(sampleObj => sampleObj.id ==data);
         var result = resultArray[0];
+        dataset(result.id)
         console.log(result);
         var otu_ids = result.otu_ids;
         var otu_labels = result.otu_labels;
         var sample_values = result.sample_values;
-        console.log(otu_ids)
+        //console.log(otu_ids)
 
         var barData = [{
             y: otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse(),
@@ -92,7 +93,6 @@ d3.selectAll("#selDataset").on("change", optionChanged);
 
 function optionChanged(sampleNew) {
     buildCharts(sampleNew);
-    dataset(sampleNew);
 }
 
 init();
