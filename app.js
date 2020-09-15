@@ -1,13 +1,13 @@
 function dataset(data) {
     d3.json("samples.json").then(function(sampleData){
-        console.log(sampleData);
+        // console.log(sampleData);
         var metadata = sampleData.metadata;
-        var resultArray = metadata.filter(sampleObj => sampleObj.id ==data);
+        var resultArray = metadata.filter(sampleObj => sampleObj.id == data);
         var result = resultArray[0];
         var panel = d3.select("#sample-metadata");
-
+        console.log(sampleData);
         panel.html("");
-
+        
         Object.entries(result).forEach(([key, value]) => {
             panel.append("h4").text(`${key.toUpperCase()}: ${value}`);
         });
@@ -21,10 +21,11 @@ function buildCharts(data) {
         var samples = sampleData.samples;
         var resultArray = samples.filter(sampleObj => sampleObj.id ==data);
         var result = resultArray[0];
-
+        console.log(result);
         var otu_ids = result.otu_ids;
         var otu_labels = result.otu_labels;
         var sample_values = result.sample_values;
+        console.log(otu_ids)
 
         var barData = [{
             y: otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse(),
@@ -35,7 +36,7 @@ function buildCharts(data) {
             marker: {
                 color: 'rgb(142, 124, 195)'
             }
-            
+
         }];
 
         var barLayout = {
@@ -43,8 +44,8 @@ function buildCharts(data) {
             yaxis: {title: 'OTU ID'},
             xaxis: {title: 'Sample Values'},
             bargap: 0.05
-        };
-
+        };                          
+        
         Plotly.newPlot('bar', barData, barLayout);
 
         var bubbleData = [{
@@ -87,8 +88,9 @@ function init() {
 
     });
 }
+d3.selectAll("#selDataset").on("change", optionChanged);
 
-function  options(sampleNew) {
+function optionChanged(sampleNew) {
     buildCharts(sampleNew);
     dataset(sampleNew);
 }
